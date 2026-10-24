@@ -1,0 +1,25 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Report an Account | COREBOUND</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#e9fbff;color:#17202b;font-family:Outfit,system-ui,sans-serif;min-height:100vh;display:grid;place-items:center;padding:20px}.card{width:min(650px,100%);background:#fff;border:1px solid #dce3eb;border-radius:18px;padding:28px;box-shadow:0 12px 32px #17324d12}h1{margin:0 0 6px}.muted{color:#627184}.field{display:grid;gap:7px;margin:16px 0}.field label{font-weight:600;font-size:.9rem}.field input,.field select,.field textarea{padding:11px;border:1px solid #cbd5e1;border-radius:9px;font:inherit;width:100%;box-sizing:border-box}.field textarea{min-height:130px;resize:vertical}.btn{border:0;border-radius:9px;background:#0b5a8a;color:#fff;padding:11px 15px;font:inherit;font-weight:600;cursor:pointer}.cancel{margin-left:12px;color:#0b5a8a;text-decoration:none}.flash{padding:10px;border-radius:8px;background:#ffebe9;color:#912018;margin:12px 0}</style></head><body><main class="card"><h1>Report an account</h1><p class="muted">Use this form to report an account for Super Admin review. Provide factual details and avoid sharing sensitive information unnecessarily.</p>
+{% with messages=get_flashed_messages(with_categories=true) %}{% for category,message in messages %}<div class="flash">{{ message }}</div>{% endfor %}{% endwith %}
+<form method="post"><div class="field"><label for="reported_user_id">Account to report</label><select id="reported_user_id" name="reported_user_id" required><option value="">Select an account</option>{% for u in targets %}<option value="{{ u.id }}">{{ u.full_name }} (@{{ u.username }}) — {{ u.role|replace('_',' ')|title }}</option>{% endfor %}</select></div>
+<div class="field"><label for="reason">Reason</label><select id="reason" name="reason" required><option value="">Choose a reason</option><option value="harassment">Harassment or bullying</option><option value="impersonation">Impersonation</option><option value="spam">Spam or misuse</option><option value="misconduct">Misconduct</option><option value="other">Other</option></select></div>
+<div class="field"><label for="description">Details</label><textarea id="description" name="description" minlength="10" maxlength="2000" required placeholder="Explain what happened, including relevant dates or context."></textarea></div><button class="btn" type="submit">Submit report</button><a class="cancel" href="{{ url_for('home') }}">Cancel</a></form></main><script>(function(){
+  if (!window.__coreboundFetchCsrf) {
+    window.__coreboundFetchCsrf = true;
+    var originalFetch = window.fetch.bind(window);
+    window.fetch = function(input, init) {
+      init = init || {};
+      var method = (init.method || (input && input.method) || 'GET').toUpperCase();
+      if (['POST','PUT','PATCH','DELETE'].indexOf(method) !== -1) {
+        var meta = document.querySelector('meta[name="csrf-token"]');
+        var token = meta ? meta.content : '';
+        var headers = new Headers(init.headers || {});
+        if (token) headers.set('X-CSRFToken', token);
+        init.headers = headers;
+      }
+      return originalFetch(input, init);
+    };
+  }
+})();</script>
+</body></html>
