@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login | LNU Campus Facility Reporting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --ink: #1c1c1c;
+    --teal: #0b5a73;
+    --blue: #0d68a8;
+    --blue-dark: #09507f;
+    --line: #2b2b2b;
+    --ok: #1f7a4d;
+    --bad: #b3261e;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    font-family: "Alegreya", Georgia, "Times New Roman", serif;
+    font-size: 1.05rem;
+    color: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+    background:
+      url("/static/campus-background.jpg") center / cover no-repeat,
+      linear-gradient(160deg, #cfd8de, #eef1f3);
+  }
+  :focus-visible { outline: 3px solid #e0a800; outline-offset: 2px; }
+
+  .card {
+    width: 100%;
+    max-width: 380px;
+    min-width: 0;
+    background: #fff;
+    border-radius: 28px;
+    padding: 32px 34px 24px;
+    box-shadow: 8px 8px 0 rgba(0, 0, 0, .22);
+    overflow: hidden;
+  }
+  h1 {
+    margin: 0; font-size: 1.9rem; font-weight: 700;
+    text-shadow: 2px 2px 0 rgba(11, 90, 115, .35);
+  }
+  .sub { margin: 0 0 18px; color: var(--teal); }
+
+  label { display: block; font-weight: 500; margin: 10px 0 4px; }
+  input[type="text"], input[type="password"] {
+    width: 100%; font: inherit; color: var(--ink);
+    padding: 9px 12px; border: 1px solid var(--line); border-radius: 12px;
+  }
+  input::placeholder { color: #a3a3a3; }
+
+  .options {
+    display: flex; align-items: center; justify-content: space-between;
+    margin: 14px 0 18px; font-size: .88rem; white-space: nowrap;
+  }
+  .options label { margin: 0; display: flex; align-items: center; gap: 8px; font-weight: 400; }
+  .options input { width: 18px; height: 18px; margin: 0; }
+  .options a { color: var(--teal); text-decoration: none; }
+  .options a:hover { text-decoration: underline; }
+
+  /* Keep Google's fixed-width reCAPTCHA widget inside the login card. */
+  .captcha-slot {
+    width: 100%;
+    min-width: 0;
+    min-height: 78px;
+    margin: 14px 0 16px;
+    overflow: hidden;
+  }
+  .captcha-slot .g-recaptcha {
+    max-width: 100%;
+    transform-origin: left top;
+  }
+  .captcha-slot iframe {
+    max-width: 100%;
+  }
+  @media (max-width: 420px) {
+    body { padding: 14px; }
+    .card {
+      max-width: 380px;
+      padding: 28px 22px 22px;
+      border-radius: 22px;
+    }
+    .captcha-slot {
+      min-height: 70px;
+    }
+    .captcha-slot .g-recaptcha {
+      transform: scale(.92);
+    }
+  }
+  @media (max-width: 350px) {
+    .captcha-slot .g-recaptcha {
+      transform: scale(.82);
+    }
+    .captcha-slot { min-height: 64px; }
+  }
+
+  .btn {
+    width: 100%; padding: 10px; border: 1px solid #07406a; border-radius: 12px;
+    background: var(--blue); color: #fff; font: inherit; font-size: 1.05rem; cursor: pointer;
+  }
+  .btn:hover { background: var(--blue-dark); }
+
+  .switch { text-align: center; margin: 8px 0 0; font-size: .92rem; }
+  .switch a { color: var(--ink); }
+
+  .flash { padding: 8px 12px; border-radius: 10px; margin-bottom: 12px; font-size: .92rem; }
+  .flash.error { background: #fdecea; color: var(--bad); border: 1px solid #f2b8b5; }
+  .flash.success { background: #e9f6ef; color: var(--ok); border: 1px solid #b4dec8; }
+</style>
+</head>
+
+<body>
+  <main class="card">
+    <h1>Login</h1>
+    <p class="sub">Login to your account</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}" role="alert">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="post" action="/login" autocomplete="on">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" placeholder="Enter username"
+             value="{{ form.get('username', '') }}" autocomplete="username" required>
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" placeholder="Enter password"
+             autocomplete="current-password" required>
+
+      <div class="options">
+        <label><input type="checkbox" name="remember"> Remember Me</label>
+        <a href="#">Forgot Password?</a>
+      </div>
+
+      <!-- CAPTCHA widget -->
+      <div class="captcha-slot" id="captcha-slot">
+            {% if recaptcha_site_key %}
+              <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+            {% else %}
+              <p role="alert" style="color:#b3261e">CAPTCHA is not configured. Set RECAPTCHA_SITE_KEY and restart COREBOUND.</p>
+            {% endif %}
+          </div>
+
+      <button class="btn" type="submit">Login</button>
+    </form>
+
+    <p class="switch">Don't have an account? <a href="/register">Register</a></p>
+  </main>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<script>(function(){
+  if (!window.__coreboundFetchCsrf) {
+    window.__coreboundFetchCsrf = true;
+    var originalFetch = window.fetch.bind(window);
+    window.fetch = function(input, init) {
+      init = init || {};
+      var method = (init.method || (input && input.method) || 'GET').toUpperCase();
+      if (['POST','PUT','PATCH','DELETE'].indexOf(method) !== -1) {
+        var meta = document.querySelector('meta[name="csrf-token"]');
+        var token = meta ? meta.content : '';
+        var headers = new Headers(init.headers || {});
+        if (token) headers.set('X-CSRFToken', token);
+        init.headers = headers;
+      }
+      return originalFetch(input, init);
+    };
+  }
+})();</script>
+</body>
+</html>

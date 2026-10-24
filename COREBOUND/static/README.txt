@@ -1,0 +1,1 @@
+Copy your existing static assets into this folder: LNU.png, logo.png or LOGO.png, and campus-background.jpg. Preserve the filenames expected by the templates, or update the templates to match your asset names. The source assets were not included in this upload batch.

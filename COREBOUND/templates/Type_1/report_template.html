@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Report an issue | COREBOUND</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@500;700&family=Kaushan+Script&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --yellow: #f9dc4e;
+    --sky: #e9fbff;
+    --active: #0aa0e8;
+    --blue: #0b5a8a;
+    --ink: #17202b;
+    --muted: #5d6879;
+    --green: #2f7d32;
+    --line: #c9ced8;
+    --action: #4d5f8f;
+    --ok: #1f7a4d;
+    --bad: #b3261e;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Outfit", system-ui, "Segoe UI", sans-serif; color: var(--ink); background: var(--sky); }
+  a { color: inherit; text-decoration: none; }
+  :focus-visible { outline: 3px solid var(--active); outline-offset: 2px; }
+  svg { display: block; }
+  [hidden] { display: none !important; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* ---------- Header ---------- */
+  .header { background: var(--yellow); display: flex; align-items: center; gap: 20px; padding-right: 28px; min-height: 70px; }
+  .brand { display: flex; align-items: stretch; flex: 0 1 auto; }
+  .brand-logo { width: 80px; background: #fff; display: flex; align-items: center; justify-content: center; padding: 6px; }
+  .brand-logo img { width: 100%; height: 100%; object-fit: contain; }
+  .brand-text { padding: 6px 16px; }
+  .brand-text h1 { margin: 0; font-size: 2rem; line-height: 1; letter-spacing: .03em; font-weight: 700; color: #fff; text-shadow: 2px 2px 0 #1b5fa8; }
+  .brand-text p { margin: 2px 0 0; max-width: 270px; font-family: "Alegreya", Georgia, serif; font-weight: 700; font-size: .9rem; line-height: 1.15; color: var(--blue); }
+  .search { flex: 1 1 200px; max-width: 280px; margin: 0 auto; }
+  .search input { width: 100%; height: 34px; padding: 0 16px; font: inherit; font-size: .9rem; border: 1px solid #333; border-radius: 999px; background: #fff; }
+  .tools { display: flex; align-items: center; gap: 22px; margin-left: auto; }
+  .menu-wrap { position: relative; }
+  .icon-btn, .user-btn { background: transparent; border: 0; cursor: pointer; font: inherit; color: var(--ink); }
+  .icon-btn { position: relative; width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; }
+  .icon-btn svg { width: 26px; height: 26px; }
+  .badge { position: absolute; top: 0; right: 0; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 9px; background: #d93025; color: #fff; font-size: .7rem; font-weight: 600; display: grid; place-items: center; }
+  .user-btn { display: flex; align-items: center; gap: 10px; text-align: left; }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; background: #fff; display: grid; place-items: center; }
+  .avatar svg { width: 24px; height: 24px; }
+  .user-btn b { display: block; font-family: "Alegreya", Georgia, serif; font-size: .95rem; line-height: 1.1; }
+  .user-btn small { font-family: "Alegreya", Georgia, serif; font-weight: 500; font-size: .9rem; }
+  .user-btn .caret { width: 14px; height: 14px; }
+  .dropdown { position: absolute; right: 0; top: calc(100% + 8px); z-index: 20; min-width: 240px; background: #fff; border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.18); padding: 8px; font-size: .9rem; }
+  .dropdown h2 { margin: 4px 8px 6px; font-size: .85rem; color: var(--muted); font-weight: 600; }
+  .dropdown .note { padding: 8px; border-radius: 8px; }
+  .dropdown .note.unread { background: #eef7ff; }
+  .dropdown .note small { display: block; color: var(--muted); }
+  .dropdown .empty { padding: 8px; color: var(--muted); }
+  .dropdown a { display: block; padding: 8px; border-radius: 8px; }
+  .dropdown a:hover { background: var(--sky); }
+
+  /* ---------- Navigation ---------- */
+  .nav { background: var(--sky); display: flex; align-items: stretch; border-bottom: 1px solid #cfe9ef; }
+  .nav a { display: flex; align-items: center; gap: 8px; padding: 0 26px; min-height: 52px; font-weight: 500; font-size: .95rem; }
+  .nav a svg { width: 22px; height: 22px; }
+  .nav a:hover { background: #d6f3fb; }
+  .nav a.active { background: var(--active); color: #fff; font-weight: 600; }
+  .nav .spacer { flex: 1; }
+  .nav .logout { border-left: 1px solid #333; padding: 0 40px 0 22px; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    color: #fff; padding: 34px 24px 44px;
+    background:
+      linear-gradient(rgba(8,46,112,.5), rgba(8,46,112,.4)),
+      url("{{ url_for('static', filename='LNU.png') }}") center / cover no-repeat,
+      #1b4c8f;
+  }
+  .wrap { max-width: 1020px; margin: 0 auto; }
+  .hero h2 { margin: 0; font-family: "Alegreya", Georgia, serif; font-size: 2.3rem; line-height: 1.1; text-shadow: 2px 2px 4px rgba(0,0,0,.4); }
+  .hero .lead { margin: 4px 0 0; font-size: .95rem; text-shadow: 1px 1px 3px rgba(0,0,0,.5); }
+
+  /* ---------- Form panel ---------- */
+  .panel {
+    margin-top: 28px; background: #fff; color: var(--ink); border-radius: 20px; overflow: hidden;
+    box-shadow: 0 6px 18px rgba(0,0,0,.22);
+    display: grid; grid-template-columns: minmax(0, 1fr) 330px;
+  }
+  .left { padding: 22px 26px 26px; }
+  .right { padding: 22px 24px 24px; border-left: 1px solid #333; display: flex; flex-direction: column; gap: 20px; }
+  .panel h3 { margin: 0 0 14px; font-size: 1.05rem; font-weight: 600; }
+  .grid2 { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 14px 40px; }
+  .grid2.even { grid-template-columns: 1fr 1fr; }
+  .field { margin-bottom: 12px; min-width: 0; }
+  .full { grid-column: 1 / -1; }
+  label, .label { display: flex; align-items: center; gap: 6px; font-size: .82rem; font-weight: 600; margin-bottom: 6px; }
+  label svg { width: 16px; height: 16px; }
+  input[type="text"], input[type="date"], input[type="time"], select, textarea {
+    width: 100%; font: inherit; font-size: .88rem; color: var(--ink); background: #fff;
+    border: 1px solid #333; border-radius: 3px; padding: 10px 14px;
+  }
+  input::placeholder, textarea::placeholder { color: #8a8f99; }
+  select {
+    appearance: none; padding-right: 36px;
+    background: #fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23222' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='M5 9l7 7 7-7'/></svg>") right 12px center / 14px no-repeat;
+  }
+  select:invalid { color: #8a8f99; }
+  textarea { min-height: 110px; resize: vertical; }
+  .divider { border: 0; border-top: 1px solid #333; margin: 6px -26px 18px; }
+  .iconfield { position: relative; }
+  .iconfield svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; pointer-events: none; }
+  .iconfield input { padding-left: 40px; }
+
+  /* Attachment */
+  .drop { border: 1px solid #333; padding: 22px 16px 16px; text-align: center; font-size: .78rem; color: var(--muted); transition: background .15s; }
+  .drop.over { background: #eaf6ff; border-color: var(--active); }
+  .drop svg.cloud { width: 54px; height: 54px; margin: 0 auto 8px; color: var(--ink); }
+  .drop p { margin: 0 0 10px; }
+  .choose { border: 0; background: #98a58a; color: #1f2a12; font: inherit; font-weight: 600; font-size: .8rem; padding: 5px 30px; border-radius: 999px; cursor: pointer; }
+  .choose:hover { filter: brightness(.95); }
+  .formats { margin-top: 12px; font-size: .72rem; }
+  .preview { display: flex; align-items: center; gap: 10px; margin-top: 14px; text-align: left; font-size: .78rem; color: var(--ink); }
+  .preview img { width: 54px; height: 54px; object-fit: cover; border-radius: 4px; border: 1px solid var(--line); }
+  .preview span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+  .preview button { border: 0; background: transparent; color: var(--bad); cursor: pointer; font: inherit; font-size: .78rem; text-decoration: underline; }
+  .file-error { margin: 8px 0 0; color: var(--bad); font-size: .78rem; }
+
+  .submit { align-self: center; border: 0; background: var(--action); color: #fff; font: inherit; font-weight: 600; font-size: .88rem; padding: 9px 36px; border-radius: 3px; cursor: pointer; }
+  .submit:hover:not(:disabled) { filter: brightness(1.1); }
+  .submit:disabled { opacity: .6; cursor: not-allowed; }
+
+  .guide { background: #ffe4e4; padding: 14px 18px; border-radius: 4px; font-size: .78rem; margin-top: auto; }
+  .guide h4 { margin: 0 0 6px; font-size: .95rem; font-weight: 600; }
+  .guide ul { margin: 0; padding-left: 18px; }
+  .guide li { margin-bottom: 3px; }
+
+
+  .duplicate-warning { margin: 0 0 18px; padding: 16px; border: 2px solid #d97706; background: #fff7ed; color: #7c2d12; border-radius: 8px; }
+  .duplicate-warning h3 { margin: 0 0 8px; color: #9a3412; }
+  .duplicate-item { padding: 10px 0; border-top: 1px solid #fed7aa; }
+  .duplicate-item p { margin: 4px 0; }
+  .duplicate-item a { color: #1d4ed8; font-weight: 700; }
+  .duplicate-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+  .duplicate-actions button { padding: 11px 14px; border: 0; border-radius: 6px; cursor: pointer; font-weight: 700; }
+  .duplicate-continue { background: #9a3412; color: white; }
+  .duplicate-cancel { display: inline-flex; align-items: center; background: #e5e7eb; color: #111827; text-decoration: none; padding: 11px 14px; border-radius: 6px; font-weight: 700; }
+
+  .flash { margin: 0 0 16px; padding: 10px 14px; border-radius: 6px; font-size: .9rem; }
+  .flash.error { background: #fdecea; color: var(--bad); border: 1px solid #f2b8b5; }
+  .flash.success { background: #e9f6ef; color: var(--ok); border: 1px solid #b4dec8; }
+
+  /* ---------- Footer band ---------- */
+  .band { background: var(--sky); padding: 0 24px; }
+  .band .wrap { display: flex; align-items: center; gap: 70px; }
+  .band img { width: 130px; height: 96px; object-fit: cover; flex: none; }
+  .band h4 { margin: 0 0 4px; font-size: 1.15rem; font-weight: 600; color: var(--blue); }
+  .band p { margin: 0; font-family: "Kaushan Script", cursive; font-size: .85rem; line-height: 1.4; max-width: 300px; }
+  .grass { height: 14px; background: var(--green); }
+
+  @media (max-width: 900px) {
+    .panel { grid-template-columns: minmax(0, 1fr); }
+    .right { border-left: 0; border-top: 1px solid #333; }
+    .header { flex-wrap: wrap; padding: 0 16px 10px 0; }
+    .search { order: 3; flex-basis: 100%; max-width: none; margin: 0 0 0 16px; }
+    .nav { flex-wrap: wrap; }
+    .nav a { padding: 0 16px; }
+    .nav .spacer { display: none; }
+    .nav .logout { border-left: 0; margin-left: auto; padding: 0 20px; }
+    .band .wrap { gap: 24px; }
+  }
+  @media (max-width: 560px) {
+    .grid2, .grid2.even { grid-template-columns: 1fr; }
+    .user-btn span.who, .brand-text p, .band img { display: none; }
+    .hero h2 { font-size: 1.8rem; }
+    .left { padding: 18px; }
+    .divider { margin-left: -18px; margin-right: -18px; }
+  }
+</style>
+</head>
+
+<body>
+  <!-- ===== Header ===== -->
+  <header class="header">
+    <div class="brand">
+      <div class="brand-logo"><img src="{{ url_for('static', filename='logo.png') }}" alt="COREBOUND logo"></div>
+      <div class="brand-text">
+        <h1>COREBOUND</h1>
+        <p>Facility and Equipment damaged Reporting System</p>
+      </div>
+    </div>
+
+    <form class="search" action="/my-reports" method="get" role="search">
+      <input type="search" name="q" placeholder="Search my reports" aria-label="Search my reports">
+    </form>
+
+    <div class="tools">
+      <div class="menu-wrap">
+        <button class="icon-btn" type="button" id="bellBtn" aria-haspopup="true" aria-expanded="false"
+                aria-label="Notifications{% if unread %}, {{ unread }} unread{% endif %}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/>
+          </svg>
+          {% if unread %}<span class="badge">{{ unread if unread < 10 else '9+' }}</span>{% endif %}
+        </button>
+        <div class="dropdown" id="bellMenu" hidden>
+          <h2>Notifications</h2>
+          {% for n in notifications %}
+            <div class="note {{ 'unread' if n.unread }}">{{ n.message }}<small>{{ n.date }}</small></div>
+          {% else %}
+            <div class="empty">No notifications yet.</div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="menu-wrap">
+        <button class="user-btn" type="button" id="userBtn" aria-haspopup="true" aria-expanded="false">
+          <span class="avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+          </span>
+          <span class="who"><b>{{ user.full_name }}</b><small>{{ user.department }}</small></span>
+          <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9l7 7 7-7"/></svg>
+        </button>
+        <div class="dropdown" id="userMenu" hidden><a href="/logout">Logout</a></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== Navigation ===== -->
+  <nav class="nav" aria-label="Main">
+    <a href="/home">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3 2 12h3v8h5v-5h4v5h5v-8h3L12 3z"/></svg>
+      Dashboard
+    </a>
+    <a href="/report" class="active" aria-current="page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4"/><path d="M14 3l5 5v3"/><path d="M14 3v5h5"/><path d="M18 14v7M14.5 17.5h7"/></svg>
+      Report an issue
+    </a>
+    <a href="/my-reports">My Reports</a>
+    <a href="/feedback">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8.5c1-1.8 4-1.4 4 .9 0 1.9-4 4.100-4 4.100s-4-2.200-4-4.100c0-2.300 3-2.700 4-.9z"/><path d="M2 16h4l5 2 7-3 3 1.500-9 4.500-6-2H2z"/></svg>
+      Feedback
+    </a>
+    <span class="spacer"></span>
+    <a href="/logout" class="logout">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h5"/><path d="M15 8l4 4-4 4M19 12H9"/></svg>
+      Logout
+    </a>
+  </nav>
+
+  <!-- ===== Report form ===== -->
+  <main class="hero">
+    <div class="wrap">
+      <h2>Report an issue</h2>
+      <p class="lead">help us keep LNU safe and functional. Fill out the form below to report a facility issue.</p>
+
+      <form class="panel" id="reportForm" method="post" action="/report" enctype="multipart/form-data">
+        <div class="left">
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+              <div class="flash {{ category }}" role="alert">{{ message }}</div>
+            {% endfor %}
+          {% endwith %}
+          {% if duplicate_matches %}
+            <section class="duplicate-warning" role="alert" aria-labelledby="duplicateHeading">
+              <h3 id="duplicateHeading">Possible duplicate report detected</h3>
+              <p>COREBOUND found existing open reports that may describe the same issue. Review them before continuing.</p>
+              {% for match in duplicate_matches %}
+                <div class="duplicate-item">
+                  <p><strong>{{ match.ticket_no }}</strong> — {{ match.title }}</p>
+                  <p>Location: {{ match.location }} | Department: {{ match.department }}</p>
+                  <p>Category: {{ match.category }} | Status: {{ match.status }} | Similarity: {{ match.score }}%</p>
+                  <p><a href="{{ url_for('my_reports', q=match.ticket_no) }}" target="_blank" rel="noopener">Find/open this existing report in a new tab</a></p>
+                </div>
+              {% endfor %}
+              <p><strong>Is this a different issue?</strong> You may continue to submit it. Please reattach your photo if you selected one; browsers do not allow a file input to be restored automatically.</p>
+              <input type="hidden" name="confirm_separate_issue" value="1">
+              <div class="duplicate-actions">
+                <button type="submit" class="duplicate-continue">This is a separate issue — continue</button>
+                <a class="duplicate-cancel" href="{{ url_for('report') }}">Cancel and review reports</a>
+              </div>
+            </section>
+          {% endif %}
+          {% if not departments %}
+            <div class="flash error" role="alert">No departments have been set up yet, so reports can't be sent. Please contact the administrator.</div>
+          {% endif %}
+
+          <h3>Issue Details</h3>
+          <div class="grid2">
+            <div class="field">
+              <label for="title">Title</label>
+              <input type="text" id="title" name="title" maxlength="100" placeholder="e.g. Broken classroom equipment"
+                     value="{{ form.get('title', '') }}" required>
+            </div>
+            <div class="field">
+              <label for="category">Category</label>
+              <select id="category" name="category" required>
+                <option value="" disabled {{ 'selected' if not form.get('category') }}>Select Category</option>
+                {% for value, label in categories %}
+                  <option value="{{ value }}" {{ 'selected' if form.get('category') == value }}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="location">Location</label>
+              <input type="text" id="location" name="location" maxlength="150" placeholder="e.g. Room, Building"
+                     value="{{ form.get('location', '') }}" required>
+            </div>
+            <div class="field">
+              <label for="department_id">Department</label>
+              <select id="department_id" name="department_id" required {{ 'disabled' if not departments }}>
+                <option value="" disabled {{ 'selected' if not form.get('department_id') }}>Select Department</option>
+                {% for d in departments %}
+                  <option value="{{ d.id }}" {{ 'selected' if form.get('department_id') == d.id|string }}>{{ d.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="field full">
+              <label for="description">Description</label>
+              <textarea id="description" name="description" minlength="10" maxlength="1000"
+                        placeholder="provide a detailed description of the issue...." required>{{ form.get('description', '') }}</textarea>
+            </div>
+          </div>
+
+          <hr class="divider">
+
+          <h3>Incident Date &amp; Time</h3>
+          <div class="grid2 even">
+            <div class="field">
+              <label for="incident_date">Date of Incident</label>
+              <div class="iconfield">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.500" y="5" width="17" height="15" rx="2"/><path d="M3.500 10h17M8 3v4M16 3v4"/></svg>
+                <input type="date" id="incident_date" name="incident_date" max="{{ today }}" value="{{ form.get('incident_date', '') }}" required>
+              </div>
+            </div>
+            <div class="field">
+              <label for="incident_time">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                Time of Incident
+              </label>
+              <input type="time" id="incident_time" name="incident_time" value="{{ form.get('incident_time', '') }}" required>
+            </div>
+          </div>
+        </div>
+
+        <aside class="right">
+          <div>
+            <h3>Attachment/Photo</h3>
+            <div class="drop" id="drop">
+              <svg class="cloud" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M7 18a4.500 4.500 0 0 1-.7-8.950A6 6 0 0 1 17.800 9 4.500 4.500 0 0 1 17 18"/><path d="M12 21v-8M8.800 15.800 12 12.600l3.200 3.200"/>
+              </svg>
+              <p>drag or drop an image, or</p>
+              <button type="button" class="choose" id="chooseBtn">Choose File</button>
+              <input type="file" id="photo" name="photo" class="sr-only" accept="image/png,image/jpeg,image/webp" tabindex="-1" aria-label="Attach a photo">
+              <div class="formats">Supported formats: PNG , JPG, WEBP (max 5 MB)</div>
+              <div class="preview" id="preview" hidden>
+                <img id="previewImg" alt="Selected photo preview">
+                <span id="previewName"></span>
+                <button type="button" id="removeBtn">Remove</button>
+              </div>
+              <p class="file-error" id="fileError" role="alert" hidden></p>
+            </div>
+          </div>
+
+          <button type="submit" class="submit" id="submitBtn" {{ 'disabled' if not departments }}>Submit Report</button>
+
+          <div class="guide">
+            <h4>Report Guidelines</h4>
+            <ul>
+              <li>Be specific and detailed.</li>
+              <li>Include the exact location (building, room, area).</li>
+              <li>Choose the correct category and department.</li>
+              <li>The more details you provide, the faster we can resolve the issue.</li>
+            </ul>
+          </div>
+        </aside>
+      </form>
+    </div>
+  </main>
+
+  <!-- ===== Footer band ===== -->
+  <section class="band">
+    <div class="wrap">
+      <img src="{{ url_for('static', filename='LNU.png') }}" alt="">
+      <div>
+        <h4>A safer LNU, Together</h4>
+        <p>Report damaged or unsafe facilities so we can keep our campus safe, clean, and ready for everyone</p>
+      </div>
+    </div>
+  </section>
+  <div class="grass"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---- Dropdowns (notifications and user menu) ----
+  var pairs = [["bellBtn", "bellMenu"], ["userBtn", "userMenu"]];
+  function closeAll() {
+    pairs.forEach(function (p) {
+      document.getElementById(p[1]).hidden = true;
+      document.getElementById(p[0]).setAttribute("aria-expanded", "false");
+    });
+  }
+  pairs.forEach(function (p) {
+    var btn = document.getElementById(p[0]), menu = document.getElementById(p[1]);
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      var wasOpen = !menu.hidden;
+      closeAll();
+      menu.hidden = wasOpen;
+      btn.setAttribute("aria-expanded", wasOpen ? "false" : "true");
+    });
+  });
+  document.addEventListener("click", closeAll);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeAll(); });
+
+  // ---- Photo picker: choose or drag and drop ----
+  var input = document.getElementById("photo");
+  var drop = document.getElementById("drop");
+  var preview = document.getElementById("preview");
+  var previewImg = document.getElementById("previewImg");
+  var previewName = document.getElementById("previewName");
+  var fileError = document.getElementById("fileError");
+  var TYPES = ["image/png", "image/jpeg", "image/webp"];
+  var MAX = 5 * 1024 * 1024;
+
+  function clearPhoto() {
+    input.value = "";
+    preview.hidden = true;
+    if (previewImg.src) URL.revokeObjectURL(previewImg.src);
+    previewImg.removeAttribute("src");
+  }
+  function showError(msg) { fileError.textContent = msg; fileError.hidden = !msg; }
+
+  function handleFile(file) {
+    showError("");
+    if (!file) { clearPhoto(); return; }
+    if (TYPES.indexOf(file.type) === -1) { clearPhoto(); showError("Please choose a PNG, JPG or WEBP image."); return; }
+    if (file.size > MAX) { clearPhoto(); showError("That image is over 5 MB. Please choose a smaller one."); return; }
+    if (previewImg.src) URL.revokeObjectURL(previewImg.src);
+    previewImg.src = URL.createObjectURL(file);
+    previewName.textContent = file.name;
+    preview.hidden = false;
+  }
+
+  document.getElementById("chooseBtn").addEventListener("click", function () { input.click(); });
+  input.addEventListener("change", function () { handleFile(input.files[0]); });
+  document.getElementById("removeBtn").addEventListener("click", function () { clearPhoto(); showError(""); });
+
+  ["dragenter", "dragover"].forEach(function (ev) {
+    drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add("over"); });
+  });
+  ["dragleave", "drop"].forEach(function (ev) {
+    drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove("over"); });
+  });
+  drop.addEventListener("drop", function (e) {
+    var file = e.dataTransfer.files[0];
+    if (!file) return;
+    try {
+      var dt = new DataTransfer();
+      dt.items.add(file);
+      input.files = dt.files;
+    } catch (err) { /* very old browsers: ignore */ }
+    handleFile(file);
+  });
+
+  // ---- Stop double submits ----
+  var form = document.getElementById("reportForm");
+  var submitBtn = document.getElementById("submitBtn");
+  form.addEventListener("submit", function () {
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting\u2026";
+  });
+  window.addEventListener("pageshow", function (e) {
+    if (e.persisted) { submitBtn.disabled = false; submitBtn.textContent = "Submit Report"; }
+  });
+})();
+</script>
+</body>
+</html>
