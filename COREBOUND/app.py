@@ -1045,8 +1045,8 @@ def password_problems(pw):
     return problems
 
 
-RECAPTCHA_SITE_KEY = os.environ.get("RECAPTCHA_SITE_KEY", "6LfNhf4tAAAAACHTmR5TmgH822aietVq3z_lFZuI").strip()
-RECAPTCHA_SECRET_KEY = os.environ.get("RECAPTCHA_SECRET_KEY", "6LfNhf4tAAAAANMbo7Vvx2gBelLTLadRGX8hx7Y-").strip()
+RECAPTCHA_SITE_KEY = os.environ.get("RECAPTCHA_SITE_KEY", "").strip()
+RECAPTCHA_SECRET_KEY = os.environ.get("RECAPTCHA_SECRET_KEY", "").strip()
 RECAPTCHA_VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify"
 
 
